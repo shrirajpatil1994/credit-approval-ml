@@ -20,14 +20,14 @@ def load_data():
     return X, y
 
 
-def train_model(X, y):
+def train_model(X, y, config):
     """
     Split data and train a logistic regression model.
     """
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
-        test_size=0.4,
-        random_state=42
+        test_size=config["test_size"],
+        random_state=config["random_state"]
     )
 
     model = LogisticRegression()
@@ -47,8 +47,12 @@ def evaluate_model(model, X_test, y_test):
 
 
 if __name__ == "__main__":
+    config={
+        "test_size": 0.4,
+        "random_state": 42
+    }
     X, y = load_data()
-    model, X_test, y_test = train_model(X, y)
+    model, X_test, y_test = train_model(X, y, config)
     accuracy = evaluate_model(model, X_test, y_test)
 
     print(f"Test accuracy: {accuracy}")
