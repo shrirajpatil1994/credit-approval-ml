@@ -1,262 +1,189 @@
-# Credit Approval – Logistic Regression (Toy Model)
+# Credit Approval Modeling with Cost-Sensitive Machine Learning
 
-## Problem
-This project implements a simple binary classification model to predict credit approval based on applicant age and income.  
-It is a toy example designed to demonstrate a clean end-to-end ML workflow rather than production performance.
+## Overview
 
-## Dataset
-The dataset is a small, synthetic table with the following features:
-- age (numeric)
-- income (numeric)
+This repository implements a **cost-sensitive credit approval system** that mirrors how real-world lenders evaluate risk.  
+Instead of optimizing for accuracy or AUC, models are evaluated based on the **economic cost of decision errors**.
 
-Target:
-- approved (binary: 0 = rejected, 1 = approved)
+The project is structured in **three phases**, progressing from a simple baseline to a realistic, policy-aware decision system using tabular, textual, and image data.
 
-The dataset is intentionally minimal to focus on methodology.
+---
 
-## Model
-A Logistic Regression classifier from scikit-learn is used.
+## Core Problem
 
-Logistic regression is chosen because:
-- it is a standard baseline for binary classification
-- it is interpretable
-- it is commonly used in credit scoring as a benchmark model
+In consumer lending, classification errors are asymmetric:
 
-## Workflow
-1. Data loading and basic cleaning
-2. Feature / target separation
-3. Train-test split
-4. Model training
-5. Evaluation on held-out test data
+- **False Positives (approving bad borrowers)** lead to direct capital loss  
+- **False Negatives (rejecting good borrowers)** lead to opportunity cost  
 
-## Results
-Model accuracy is evaluated on the test set.
-Given the small dataset size, results are not statistically meaningful and are used for demonstration only.
+Treating these errors equally results in poor financial decisions.
 
-## Limitations
-- Extremely small dataset
-- No feature engineering
-- No cross-validation
-- Not suitable for real credit decisions
+**Objective:**  
+> Minimize *expected monetary loss*, not classification error.
 
-## How to Run
+---
 
-Credit Approval Modeling with Cost-Sensitive Machine Learning
-Problem Statement
+## Cost Framework
 
-In consumer lending, machine learning models are often evaluated using accuracy or AUC.
-However, credit decisions are asymmetric:
+All experiments use the same asymmetric cost assumptions:
 
-# Approving a bad borrower (false positive) leads to direct capital loss
+- False Positive cost = **100**
+- False Negative cost = **10**
 
-# Rejecting a good borrower (false negative) leads to opportunity cost
+Evaluation metric: Expected Cost = (FP × cost_fp) + (FN × cost_fn)
 
-Treating both errors equally results in suboptimal and risky lending decisions.
-This project demonstrates how to align machine learning models with financial decision-making by optimizing for expected cost rather than accuracy.
 
-Dataset - A synthetic credit dataset was generated to reflect realistic lending features:
+All reported results are based on **expected cost and cost per applicant**, not accuracy.
 
-age
+---
 
-income
+# Phase I — Baseline Credit Modeling
 
-debt_to_income
+### Goal
+Establish a clean, end-to-end ML workflow and demonstrate why accuracy is insufficient for credit decisions.
 
-credit_score
+### Dataset
+A synthetic credit dataset with realistic overlap and noise:
 
-loan_amount
+**Features**
+- age  
+- income  
+- debt_to_income  
+- credit_score  
+- loan_amount  
 
-target: approved (binary)
+**Target**
+- approved (binary)
 
-The dataset intentionally includes noise, overlap, and class imbalance to mirror real-world credit data.
+### Models Evaluated
+- Logistic Regression (baseline)
+- K-Nearest Neighbours
+- XGBoost
+- Neural Network (MLP)
 
-# Cost Assumptions
+### Key Result (Before Threshold Tuning)
 
-To reflect business reality, asymmetric costs were defined:
+| Model | Cost per Applicant |
+|------|--------------------|
+| Logistic Regression | 26.89 |
+| KNN | 7.64 |
+| XGBoost | 5.55 |
+| Neural Network | 5.62 |
 
-False Positive (approving a bad borrower): 100
+**Insight:**  
+Tree-based models significantly outperform linear and neural models on tabular credit data when evaluated by cost.
 
-False Negative (rejecting a good borrower): 10
+---
 
-All models are evaluated using expected financial loss, not accuracy.
+# Phase II — Cost Optimization & Policy Control
 
-#Models Evaluated
+### Goal
+Reduce financial loss **without changing the model**, by optimizing the decision policy.
 
-The following models were trained and evaluated using the same dataset and train–test split:
+### Threshold Optimization
+Instead of retraining, the decision threshold is swept from 0 → 1 to directly minimize expected cost.
 
-Logistic Regression (baseline)
+### Results (XGBoost)
 
-K-Nearest Neighbours
+- False Positives reduced from **157 → 12**
+- Expected Cost reduced from **16,640 → 7,120**
+- Cost per Applicant reduced from **5.55 → 2.37**
 
-XGBoost
+**~57% reduction in expected loss without retraining**
 
-Neural Network (MLP)
+### Key Insight
+> In credit systems, **policy tuning often delivers more value than model complexity**.
 
-Each model was evaluated using:
+---
 
-confusion matrix
+# Phase III — Multimodal Signals & Decision Systems
 
-expected cost
-
-cost per applicant
-
-# Results (Before Threshold Tuning)
-Model	Cost per Applicant
-Logistic Regression	26.89
-KNN	7.64
-XGBoost	5.55
-Neural Network	5.62
-
-XGBoost achieved the lowest expected cost and strongest control over false positives, which dominate financial risk.
-
-
-# Threshold Optimization
-
-Machine learning models output probabilities, not decisions.
-Instead of retraining models, the decision threshold was optimized to minimize expected cost.
-
-By sweeping thresholds from 0 to 1 and evaluating expected loss at each point:
-
-False positives were sharply reduced
-
-False negatives increased moderately
-
-Total expected loss decreased significantly
-
-Final Deployment Policy (Optimized XGBoost)
-
-
-# After threshold tuning:
-
-False Positives reduced from 157 to 12
-
-Expected Cost reduced from 16,640 to 7,120
-
-Cost per Applicant reduced from 5.55 to 2.37
-
-This represents a ~57% reduction in expected loss without retraining the model.
-
-
-
-## Key Takeaways:
-
-Accuracy is a poor metric for credit decisions
-
-Cost-sensitive evaluation is essential in finance
-
-Threshold tuning often delivers more value than model complexity
-
-Tree-based models outperform neural networks on tabular credit data
-
-Business policy should live in the decision threshold, not the model
-
-
-
-# Project Structure
-
-credit-approval-ml/
-├── src/
-│ ├── train.py
-│ ├── evaluate.py
-├── notebooks/
-│ ├── 01-exploration.ipynb
-│ ├── 04_knn_model.ipynb
-│ ├── 05_xgboost_model.ipynb
-│ ├── 06_neural_network.ipynb
-│ └── 07_xgboost_threshold_tuning.ipynb
-
-
-
-
-##PHASE II - Experimenting with more data, reading and training on images and  optimising the policy further
-
-# Problem Statement
-
-This project simulates a real-world credit approval system where decisions are evaluated not by accuracy alone, but by economic cost of errors.
-
-In lending:
-
-False positives (approving bad borrowers) are far more costly than
-
-False negatives (rejecting good borrowers)
-
-The objective is therefore to minimize expected monetary loss, not maximize classification accuracy.
-
-
-# Modeling Philosophy
-
-Instead of treating credit approval as a pure ML problem, this repo approaches it as a decision system with:
-
-cost asymmetry
-
-policy constraints
-
-human-in-the-loop signals
-
-abstention and override logic
-
-Each notebook adds one layer of realism and tests whether it reduces cost per applicant.
-
-
-
-# Experiments Overview
-Notebook	Description	Result
-08	Cost-sensitive XGBoost (tabular baseline)	Strong baseline
-09	Add structured text (location, officer notes)	Added noise
-09.2	Text ablation	Confirmed no marginal gain
-10	LLM-style policy signals	Significant cost reduction
-10.2	Threshold + policy tuning	Best result
-11	Image-based collateral signals	No improvement
-
-
-
-# Key Metric
-
-All models are evaluated using:
-
-Expected Cost = (FP × cost_fp) + (FN × cost_fn)
-
-
-With:
-
-cost_fp = 100
-
-cost_fn = 10
-
-This reflects real underwriting economics.
-
-
-## Final Results
-Approach	Cost / Applicant
-Tabular ML only	~2.78
-+ Text features	Worse
-+ Images	No improvement
-Tabular + Policy (LLM-style)	~2.73 (best)
-
-
-## Key Insight
-
-More data modalities do not guarantee better decisions.
-Weak or noisy signals increase complexity without reducing economic risk.
-
-The largest gains came not from adding data, but from policy-aware decision logic layered on top of strong tabular models.
-
-
+### Goal
+Test whether additional data modalities improve economic outcomes.
+
+### Experiments
+
+| Notebook | Description | Outcome |
+|--------|------------|--------|
+| 09 | Structured text (location, officer notes) | Added noise |
+| 09.2 | Text ablation study | No marginal gain |
+| 10 | LLM-style policy signal | Significant improvement |
+| 10.2 | Policy + threshold tuning | **Best result** |
+| 11 | Image-based collateral signals | No improvement |
+
+### Modalities Tested
+- **Tabular data** (core signal)
+- **Textual data** (location descriptors, officer notes)
+- **Image data** (collateral/property images)
+
+### Final Results (After Phase III)
+
+| Approach | Cost / Applicant |
+|--------|------------------|
+| Tabular ML only | ~2.78 |
+| + Text features | Worse |
+| + Image features | No improvement |
+| **Tabular + Policy (LLM-style)** | **~2.73 (best)** |
+
+---
+
+## Key Insights
+
+- Accuracy is a poor metric for credit decisions  
+- Cost-sensitive evaluation is essential in finance  
+- Threshold tuning often outperforms adding new models  
+- Tree-based models dominate tabular credit data  
+- **Weak signals increase noise and cost, even with more data**
+- Policy logic delivers more value than raw model complexity  
+
+---
 
 ## Why This Matters
 
-This mirrors how modern fintech lenders operate:
+This architecture mirrors real fintech underwriting systems:
 
-ML for scoring
+- ML models for scoring  
+- Policy layers for control and compliance  
+- Human-in-the-loop escalation for edge cases  
 
-policy for control
+The repository is designed to be extensible to:
+- real lender datasets
+- production scoring pipelines
+- governance and risk frameworks
 
-humans for edge cases
+---
 
-The repo is designed to be extendable to:
+## Project Structure
 
-real dataset
+credit-approval-ml/
+├── data/
+│ ├── raw/
+│ │ └── credit_dataset.csv
+│ └── processed/
+│ ├── credit_tabular.csv
+│ ├── credit_tab_text.csv
+│ └── credit_tab_text_conditioned.csv
+│
+├── notebooks/
+│ ├── 01-exploration.ipynb
+│ ├── 08-cost-sensitive-xgboost.ipynb
+│ ├── 09-text-features.ipynb
+│ ├── 09.2-text-ablation.ipynb
+│ ├── 10-llm-policy.ipynb
+│ ├── 10.2-llm-policy-tuned.ipynb
+│ └── 11-image-signal.ipynb
+│
+├── src/
+│ ├── train.py
+│ ├── evaluate.py
+│ └── config.py
+│
+└── requirements.txt
 
-production pipelines
 
-governance frameworks
+---
+
+## Status
+
+Phase I–III complete.  
+Project intentionally stops once **marginal complexity no longer reduces economic loss**.
