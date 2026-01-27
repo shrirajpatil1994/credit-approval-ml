@@ -40,8 +40,6 @@ Given the small dataset size, results are not statistically meaningful and are u
 - Not suitable for real credit decisions
 
 ## How to Run
-```bash
-pip install -r requirements.txt
 
 Credit Approval Modeling with Cost-Sensitive Machine Learning
 Problem Statement
@@ -49,16 +47,14 @@ Problem Statement
 In consumer lending, machine learning models are often evaluated using accuracy or AUC.
 However, credit decisions are asymmetric:
 
-Approving a bad borrower (false positive) leads to direct capital loss
+#Approving a bad borrower (false positive) leads to direct capital loss
 
-Rejecting a good borrower (false negative) leads to opportunity cost
+#Rejecting a good borrower (false negative) leads to opportunity cost
 
 Treating both errors equally results in suboptimal and risky lending decisions.
 This project demonstrates how to align machine learning models with financial decision-making by optimizing for expected cost rather than accuracy.
 
-Dataset
-
-A synthetic credit dataset was generated to reflect realistic lending features:
+Dataset - A synthetic credit dataset was generated to reflect realistic lending features:
 
 age
 
@@ -74,7 +70,7 @@ target: approved (binary)
 
 The dataset intentionally includes noise, overlap, and class imbalance to mirror real-world credit data.
 
-Cost Assumptions
+#Cost Assumptions
 
 To reflect business reality, asymmetric costs were defined:
 
@@ -84,7 +80,7 @@ False Negative (rejecting a good borrower): 10
 
 All models are evaluated using expected financial loss, not accuracy.
 
-Models Evaluated
+#Models Evaluated
 
 The following models were trained and evaluated using the same dataset and train–test split:
 
@@ -104,7 +100,7 @@ expected cost
 
 cost per applicant
 
-Results (Before Threshold Tuning)
+#Results (Before Threshold Tuning)
 Model	Cost per Applicant
 Logistic Regression	26.89
 KNN	7.64
@@ -114,7 +110,7 @@ Neural Network	5.62
 XGBoost achieved the lowest expected cost and strongest control over false positives, which dominate financial risk.
 
 
-Threshold Optimization
+#Threshold Optimization
 
 Machine learning models output probabilities, not decisions.
 Instead of retraining models, the decision threshold was optimized to minimize expected cost.
@@ -130,7 +126,7 @@ Total expected loss decreased significantly
 Final Deployment Policy (Optimized XGBoost)
 
 
-After threshold tuning:
+#After threshold tuning:
 
 False Positives reduced from 157 to 12
 
@@ -142,8 +138,7 @@ This represents a ~57% reduction in expected loss without retraining the model.
 
 
 
-
-Key Takeaways:
+##Key Takeaways:
 
 Accuracy is a poor metric for credit decisions
 
@@ -157,7 +152,7 @@ Business policy should live in the decision threshold, not the model
 
 
 
-Project Structure
+#Project Structure
 
 credit-approval-ml/
 ├── src/
@@ -173,9 +168,9 @@ credit-approval-ml/
 
 
 
-PHASE II - Experimenting with more data, reading and training on images and  optimising the policy further
+##PHASE II - Experimenting with more data, reading and training on images and  optimising the policy further
 
-Problem Statement
+#Problem Statement
 
 This project simulates a real-world credit approval system where decisions are evaluated not by accuracy alone, but by economic cost of errors.
 
@@ -188,9 +183,7 @@ False negatives (rejecting good borrowers)
 The objective is therefore to minimize expected monetary loss, not maximize classification accuracy.
 
 
-
-
-Modeling Philosophy
+#Modeling Philosophy
 
 Instead of treating credit approval as a pure ML problem, this repo approaches it as a decision system with:
 
@@ -206,7 +199,7 @@ Each notebook adds one layer of realism and tests whether it reduces cost per ap
 
 
 
-Experiments Overview
+#Experiments Overview
 Notebook	Description	Result
 08	Cost-sensitive XGBoost (tabular baseline)	Strong baseline
 09	Add structured text (location, officer notes)	Added noise
@@ -217,7 +210,7 @@ Notebook	Description	Result
 
 
 
-Key Metric
+#Key Metric
 
 All models are evaluated using:
 
@@ -241,7 +234,7 @@ Tabular ML only	~2.78
 Tabular + Policy (LLM-style)	~2.73 (best)
 
 
-Key Insight
+##Key Insight
 
 More data modalities do not guarantee better decisions.
 Weak or noisy signals increase complexity without reducing economic risk.
@@ -250,7 +243,7 @@ The largest gains came not from adding data, but from policy-aware decision logi
 
 
 
-Why This Matters
+##Why This Matters
 
 This mirrors how modern fintech lenders operate:
 
