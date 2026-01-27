@@ -182,8 +182,3 @@ credit-approval-ml/
 └── requirements.txt
 
 ---
-
-## Status
-
-Phase I–III complete.  
-Project intentionally stops once **marginal complexity no longer reduces economic loss**.
