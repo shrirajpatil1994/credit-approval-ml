@@ -155,31 +155,31 @@ The repository is designed to be extensible to:
 
 ## Project Structure
 
+```text
 credit-approval-ml/
 ├── data/
-│ ├── raw/
-│ │ └── credit_dataset.csv
-│ └── processed/
-│ ├── credit_tabular.csv
-│ ├── credit_tab_text.csv
-│ └── credit_tab_text_conditioned.csv
+│   ├── raw/
+│   │   └── credit_dataset.csv
+│   └── processed/
+│       ├── credit_tabular.csv
+│       ├── credit_tab_text.csv
+│       └── credit_tab_text_conditioned.csv
 │
 ├── notebooks/
-│ ├── 01-exploration.ipynb
-│ ├── 08-cost-sensitive-xgboost.ipynb
-│ ├── 09-text-features.ipynb
-│ ├── 09.2-text-ablation.ipynb
-│ ├── 10-llm-policy.ipynb
-│ ├── 10.2-llm-policy-tuned.ipynb
-│ └── 11-image-signal.ipynb
+│   ├── 01-exploration.ipynb
+│   ├── 08-cost-sensitive-xgboost.ipynb
+│   ├── 09-text-features.ipynb
+│   ├── 09.2-text-ablation.ipynb
+│   ├── 10-llm-policy.ipynb
+│   ├── 10.2-llm-policy-tuned.ipynb
+│   └── 11-image-signal.ipynb
 │
 ├── src/
-│ ├── train.py
-│ ├── evaluate.py
-│ └── config.py
+│   ├── train.py
+│   ├── evaluate.py
+│   └── config.py
 │
 └── requirements.txt
-
 
 ---
 
