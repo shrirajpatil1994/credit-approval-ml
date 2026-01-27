@@ -142,6 +142,7 @@ This represents a ~57% reduction in expected loss without retraining the model.
 
 
 
+
 Key Takeaways:
 
 Accuracy is a poor metric for credit decisions
@@ -153,6 +154,8 @@ Threshold tuning often delivers more value than model complexity
 Tree-based models outperform neural networks on tabular credit data
 
 Business policy should live in the decision threshold, not the model
+
+
 
 Project Structure
 
@@ -166,3 +169,101 @@ credit-approval-ml/
 │ ├── 05_xgboost_model.ipynb
 │ ├── 06_neural_network.ipynb
 │ └── 07_xgboost_threshold_tuning.ipynb
+
+
+
+
+PHASE II - Experimenting with more data, reading and training on images and  optimising the policy further
+
+Problem Statement
+
+This project simulates a real-world credit approval system where decisions are evaluated not by accuracy alone, but by economic cost of errors.
+
+In lending:
+
+False positives (approving bad borrowers) are far more costly than
+
+False negatives (rejecting good borrowers)
+
+The objective is therefore to minimize expected monetary loss, not maximize classification accuracy.
+
+
+
+
+Modeling Philosophy
+
+Instead of treating credit approval as a pure ML problem, this repo approaches it as a decision system with:
+
+cost asymmetry
+
+policy constraints
+
+human-in-the-loop signals
+
+abstention and override logic
+
+Each notebook adds one layer of realism and tests whether it reduces cost per applicant.
+
+
+
+Experiments Overview
+Notebook	Description	Result
+08	Cost-sensitive XGBoost (tabular baseline)	Strong baseline
+09	Add structured text (location, officer notes)	Added noise
+09.2	Text ablation	Confirmed no marginal gain
+10	LLM-style policy signals	Significant cost reduction
+10.2	Threshold + policy tuning	Best result
+11	Image-based collateral signals	No improvement
+
+
+
+Key Metric
+
+All models are evaluated using:
+
+Expected Cost = (FP × cost_fp) + (FN × cost_fn)
+
+
+With:
+
+cost_fp = 100
+
+cost_fn = 10
+
+This reflects real underwriting economics.
+
+
+Final Results
+Approach	Cost / Applicant
+Tabular ML only	~2.78
++ Text features	Worse
++ Images	No improvement
+Tabular + Policy (LLM-style)	~2.73 (best)
+
+
+Key Insight
+
+More data modalities do not guarantee better decisions.
+Weak or noisy signals increase complexity without reducing economic risk.
+
+The largest gains came not from adding data, but from policy-aware decision logic layered on top of strong tabular models.
+
+
+
+Why This Matters
+
+This mirrors how modern fintech lenders operate:
+
+ML for scoring
+
+policy for control
+
+humans for edge cases
+
+The repo is designed to be extendable to:
+
+real dataset
+
+production pipelines
+
+governance frameworks
